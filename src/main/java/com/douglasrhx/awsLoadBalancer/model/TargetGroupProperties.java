@@ -1,19 +1,19 @@
 package com.douglasrhx.awsLoadBalancer.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Map;
 
 public class TargetGroupProperties implements Serializable
 {
 	private static final long serialVersionUID = -6908282873374231009L;
 	
-	private List<String> properties;
+	private Map<String, String> properties;
 
-	public List<String> getProperties() {
+	public Map<String, String> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(List<String> properties) {
+	public void setProperties(Map<String, String> properties) {
 		this.properties = properties;
 	}
 }

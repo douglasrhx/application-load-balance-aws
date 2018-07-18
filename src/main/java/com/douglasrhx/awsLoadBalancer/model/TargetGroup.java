@@ -2,6 +2,7 @@ package com.douglasrhx.awsLoadBalancer.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 @JsonRootName("pools")
@@ -13,6 +14,7 @@ public class TargetGroup implements Serializable
 	
 	private String name;
 	
+	@JsonProperty("properties")
 	private TargetGroupProperties targetGroupProperties;
 
 	public Integer getId() {
