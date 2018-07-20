@@ -1,5 +1,8 @@
 package com.douglasrhx.awsLoadBalancer.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,14 +21,22 @@ public class ApplicationLoadBalancerController
 	@ResponseBody
 	public void createApplicationLoadBalancer(@RequestBody String body) throws Exception
 	{
-		String TARGET_GROUP_ROOT_NAME = "pools";
+		Map<String, String> mapObjectRootNameAction = ApplicationLoadBalancerUtils.createMapObjectRootNameAction();
 		
 		ApplicationLoadBalancerUtils applicationLoadBalancerUtils = new ApplicationLoadBalancerUtils();
 		
 		ApplicationLoadBalancerRequest applicationLoadBalancerRequest = new ApplicationLoadBalancerRequest();
 		
-		AbstractALBObject targetGroup = applicationLoadBalancerUtils.recoverObjectFromJson(body, TARGET_GROUP_ROOT_NAME);
-		
-		applicationLoadBalancerRequest.createObjectALB(targetGroup, "CreateTargetGroup");
+		for (Map.Entry<String, String> object : mapObjectRootNameAction.entrySet()) 
+		{
+			String OBJECT_ROOT_NAME = object.getKey();
+			
+			List<AbstractALBObject> abstractALBObjects = applicationLoadBalancerUtils.recoverObjectFromJson(body, OBJECT_ROOT_NAME);
+			
+			for (AbstractALBObject abstractALBObject : abstractALBObjects) 
+			{
+				applicationLoadBalancerRequest.createObjectALB(abstractALBObject, object.getValue());
+			}
+		}
 	}
 }

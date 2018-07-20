@@ -19,6 +19,8 @@ public class ApplicationLoadBalancerRequest
 	public void createObjectALB(AbstractALBObject abstractALBObject, String action) throws Exception
 	{		
 		String url = prepareURLCreateAction(abstractALBObject, action);
+		
+		System.out.println(url);
 
 		URL obj = new URL(url);
 		
