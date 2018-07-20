@@ -49,7 +49,7 @@ public class ApplicationLoadBalancerRequest
 		String urlWithoutProperties = "elasticloadbalancing.amazonaws.com/?Action=CreateTargetGroup" + 
 				"&Name=" + targetGroup.getName();
 		
-		Map<String, String> properties = targetGroup.getTargetGroupProperties().getProperties();
+		Map<String, String> properties = targetGroup.getObjectProperties().getProperties();
 		
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
 		

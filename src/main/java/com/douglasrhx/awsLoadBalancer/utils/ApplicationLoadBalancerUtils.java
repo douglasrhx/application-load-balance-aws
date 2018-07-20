@@ -2,8 +2,8 @@ package com.douglasrhx.awsLoadBalancer.utils;
 
 import java.io.IOException;
 
+import com.douglasrhx.awsLoadBalancer.model.AbstractALBObjectProperties;
 import com.douglasrhx.awsLoadBalancer.model.TargetGroup;
-import com.douglasrhx.awsLoadBalancer.model.TargetGroupProperties;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,11 +22,11 @@ public class ApplicationLoadBalancerUtils
 		
 		targetGroup = mapper.readValue(node.toString(), TargetGroup.class);
 		
-		TargetGroupProperties targetGroupProperties = new TargetGroupProperties();
+		AbstractALBObjectProperties objectProperties = new AbstractALBObjectProperties();
 		
-		targetGroupProperties = mapper.treeToValue(node.findParent("properties"), TargetGroupProperties.class);
+		objectProperties = mapper.treeToValue(node.findParent("properties"), AbstractALBObjectProperties.class);
 		
-		targetGroup.setTargetGroupProperties(targetGroupProperties);
+		targetGroup.setObjectProperties(objectProperties);
 		
 		return targetGroup;
 	}

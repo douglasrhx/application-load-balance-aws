@@ -3,9 +3,9 @@ package com.douglasrhx.awsLoadBalancer.model;
 import java.io.Serializable;
 import java.util.Map;
 
-public class TargetGroupProperties implements Serializable
+public class AbstractALBObjectProperties implements Serializable
 {
-	private static final long serialVersionUID = -6908282873374231009L;
+	private static final long serialVersionUID = 1510497250730884059L;
 	
 	private Map<String, String> properties;
 
