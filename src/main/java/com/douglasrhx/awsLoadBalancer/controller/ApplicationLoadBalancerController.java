@@ -9,11 +9,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.douglasrhx.awsLoadBalancer.model.TargetGroup;
-import com.douglasrhx.awsLoadBalancer.model.TargetGroupProperties;
 import com.douglasrhx.awsLoadBalancer.utils.ApplicationLoadBalancerUtils;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RequestMapping(value = "/aws")
 @RestController
@@ -27,17 +23,7 @@ public class ApplicationLoadBalancerController
 		
 		ApplicationLoadBalancerUtils applicationLoadBalancerUtils = new ApplicationLoadBalancerUtils();
 		
-		TargetGroup targetGroup = new TargetGroup();
-		
-		ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		
-		JsonNode node = mapper.readTree(body);
-		
-		TargetGroupProperties targetGroupProperties = applicationLoadBalancerUtils.recoverTargetGroupPropertiesFromJson(node);
-		
-		targetGroup = mapper.treeToValue(node.findValue(TARGET_GROUP_ROOT_NAME), TargetGroup.class);
-		
-		targetGroup.setTargetGroupProperties(targetGroupProperties);
+		TargetGroup targetGroup = applicationLoadBalancerUtils.recoverTargetGroupFromJson(body, TARGET_GROUP_ROOT_NAME);
 		
 		return targetGroup;
 	}
