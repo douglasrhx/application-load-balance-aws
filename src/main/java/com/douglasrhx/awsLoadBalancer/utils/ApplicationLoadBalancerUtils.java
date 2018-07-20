@@ -2,33 +2,40 @@ package com.douglasrhx.awsLoadBalancer.utils;
 
 import java.io.IOException;
 
+import com.douglasrhx.awsLoadBalancer.model.AbstractALBObject;
 import com.douglasrhx.awsLoadBalancer.model.AbstractALBObjectProperties;
-import com.douglasrhx.awsLoadBalancer.model.TargetGroup;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ApplicationLoadBalancerUtils 
 {
-	public TargetGroup recoverTargetGroupFromJson(String body, String objectRootNameInJson) throws IOException
+	public AbstractALBObject recoverObjectFromJson(String body, String objectRootNameInJson) throws Exception
 	{
-		String targetGroupJson = extractJsonObjectFromBody(body, objectRootNameInJson);
-				
-		TargetGroup targetGroup = new TargetGroup();
+		String objectJson = extractJsonObjectFromBody(body, objectRootNameInJson);
+		
+		AbstractALBObject abstractALBObject = recoverAbstractALBObjectFromJson(objectJson);
+		
+		return abstractALBObject;
+	}
+	
+	private AbstractALBObject recoverAbstractALBObjectFromJson(String objectJson) throws Exception
+	{
+		AbstractALBObject abstractALBObject;
 		
 		ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		
-		JsonNode node = mapper.readTree(targetGroupJson);
+		JsonNode node = mapper.readTree(objectJson);
 		
-		targetGroup = mapper.readValue(node.toString(), TargetGroup.class);
+		abstractALBObject = mapper.readValue(node.toString(), AbstractALBObject.class);
 		
 		AbstractALBObjectProperties objectProperties = new AbstractALBObjectProperties();
 		
 		objectProperties = mapper.treeToValue(node.findParent("properties"), AbstractALBObjectProperties.class);
 		
-		targetGroup.setObjectProperties(objectProperties);
+		abstractALBObject.setObjectProperties(objectProperties);
 		
-		return targetGroup;
+		return abstractALBObject;
 	}
 	
 	private String extractJsonObjectFromBody(String body, String objectRootNameInJson) throws IOException

@@ -7,16 +7,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.douglasrhx.awsLoadBalancer.ApplicationLoadBalancerRequest;
-import com.douglasrhx.awsLoadBalancer.model.TargetGroup;
+import com.douglasrhx.awsLoadBalancer.model.AbstractALBObject;
 import com.douglasrhx.awsLoadBalancer.utils.ApplicationLoadBalancerUtils;
 
 @RequestMapping(value = "/aws")
 @RestController
 public class ApplicationLoadBalancerController 
 {	
-	@RequestMapping(value = "/targetGroup", method = RequestMethod.POST)
+	@RequestMapping(value = "/loadBalancer", method = RequestMethod.POST)
 	@ResponseBody
-	public void postTargetGroup(@RequestBody String body) throws Exception
+	public void createApplicationLoadBalancer(@RequestBody String body) throws Exception
 	{
 		String TARGET_GROUP_ROOT_NAME = "pools";
 		
@@ -24,8 +24,8 @@ public class ApplicationLoadBalancerController
 		
 		ApplicationLoadBalancerRequest applicationLoadBalancerRequest = new ApplicationLoadBalancerRequest();
 		
-		TargetGroup targetGroup = applicationLoadBalancerUtils.recoverTargetGroupFromJson(body, TARGET_GROUP_ROOT_NAME);
+		AbstractALBObject targetGroup = applicationLoadBalancerUtils.recoverObjectFromJson(body, TARGET_GROUP_ROOT_NAME);
 		
-		applicationLoadBalancerRequest.createTargetGroup(targetGroup);
+		applicationLoadBalancerRequest.createObjectALB(targetGroup, "CreateTargetGroup");
 	}
 }

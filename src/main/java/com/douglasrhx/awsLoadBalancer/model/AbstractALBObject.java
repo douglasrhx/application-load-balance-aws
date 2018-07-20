@@ -11,7 +11,7 @@ public class AbstractALBObject implements Serializable
 	private String id;
 	
 	private String name;
-
+	
 	@JsonProperty("properties")
 	private AbstractALBObjectProperties objectProperties;
 

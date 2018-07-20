@@ -12,13 +12,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.douglasrhx.awsLoadBalancer.model.TargetGroup;
+import com.douglasrhx.awsLoadBalancer.model.AbstractALBObject;
 
 public class ApplicationLoadBalancerRequest 
 {
-	public void createTargetGroup(TargetGroup targetGroup) throws Exception
-	{
-		String url = prepareURLCreateTargetGroup(targetGroup);
+	public void createObjectALB(AbstractALBObject abstractALBObject, String action) throws Exception
+	{		
+		String url = prepareURLCreateAction(abstractALBObject, action);
 
 		URL obj = new URL(url);
 		
@@ -44,12 +44,12 @@ public class ApplicationLoadBalancerRequest
 		System.out.println(response.toString());
 	}
 	
-	private String prepareURLCreateTargetGroup(TargetGroup targetGroup)
+	private String prepareURLCreateAction(AbstractALBObject abstractALBObject, String action)
 	{
-		String urlWithoutProperties = "elasticloadbalancing.amazonaws.com/?Action=CreateTargetGroup" + 
-				"&Name=" + targetGroup.getName();
+		String urlWithoutProperties = "elasticloadbalancing.amazonaws.com/?Action=" + action + 
+				"&Name=" + abstractALBObject.getName();
 		
-		Map<String, String> properties = targetGroup.getObjectProperties().getProperties();
+		Map<String, String> properties = abstractALBObject.getObjectProperties().getProperties();
 		
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
 		
