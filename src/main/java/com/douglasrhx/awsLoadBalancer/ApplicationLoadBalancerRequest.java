@@ -1,67 +1,109 @@
 package com.douglasrhx.awsLoadBalancer;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.TreeMap;
 
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.douglasrhx.awsLoadBalancer.model.AbstractALBObject;
 
 public class ApplicationLoadBalancerRequest 
 {
-	public void createObjectALB(AbstractALBObject abstractALBObject, String action) throws Exception
+	private String awsAccessKeyID;
+	private String awsSecretAccessKey;
+	private String regionName;
+	private String serviceName;
+	private String httpMethod;
+	private String canonicalURI;
+	private String host;
+	
+	public void createObjectALB(AbstractALBObject abstractALBObject, String action) throws Exception 
 	{		
-		String url = prepareURLCreateAction(abstractALBObject, action);
-
-		URL obj = new URL(url);
+		prepareAuthorizationParameters();
 		
-		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-		con.setRequestMethod("GET");
-
-		int responseCode = con.getResponseCode();
+		String url = prepareURLWithQueryString(abstractALBObject, action);
 		
-		System.out.println("\nSending 'GET' request to URL : " + url);
-		System.out.println("Response Code : " + responseCode);
+		Map<String, String> awsHeaders = new TreeMap<String, String>();
 
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		String inputLine;
-		StringBuffer response = new StringBuffer();
+		awsHeaders.put("content-type", "application/x-www-form-urlencode");
+		awsHeaders.put("host", host);
+		
+		AwsCanonicalRequest awsCanonicalRequest = new AwsCanonicalRequest.Builder(awsAccessKeyID, awsSecretAccessKey)
+					                .regionName(regionName)
+					                .serviceName(serviceName)
+					                .httpMethod(httpMethod)
+					                .canonicalURI(canonicalURI)
+					                .queryParameters(null)
+					                .awsHeaders(awsHeaders)
+					                .payload(null)
+					                .build();
 
-		while ((inputLine = in.readLine()) != null) 
+		Map<String, String> header = awsCanonicalRequest.prepareAuthorizationHeader();
+
+		HttpGet httpGet = new HttpGet(url);
+
+		for (Map.Entry<String, String> entrySet : header.entrySet())
 		{
-			response.append(inputLine);
+			httpGet.addHeader(entrySet.getKey(), entrySet.getValue());
 		}
+
+		HttpClient httpClient = HttpClientBuilder.create().build();
+
+		HttpResponse response = httpClient.execute(httpGet);
+
+		System.out.println("\n=====> Sending requesst to URL: " + url);
+		System.out.println("\n=====> Executing request... ");
+		System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
+
+		BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+		String inputLine;
+		StringBuffer result = new StringBuffer();
+
+		while ((inputLine = in.readLine()) != null)
+		{
+			result.append(inputLine);
+		}
+		
 		in.close();
 
-		System.out.println(response.toString());
+		System.out.println(result.toString());
 	}
 	
-	private String prepareURLCreateAction(AbstractALBObject abstractALBObject, String action)
+	public String prepareURLWithQueryString(AbstractALBObject abstractALBObject, String action)
 	{
-		String urlWithoutProperties = "elasticloadbalancing.amazonaws.com/?Action=" + action + 
-				"&Name=" + abstractALBObject.getName();
+		StringBuilder url = new StringBuilder();
+		
+		url.append("https://" + host + "/?Action=" + action);
 		
 		Map<String, String> properties = abstractALBObject.getObjectProperties().getProperties();
 		
-		MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
+		for (Map.Entry<String,String> entrySet : properties.entrySet()) 
+		{
+			url.append("&").append(entrySet.getKey()).append("=").append(entrySet.getValue());
+		}
 		
-	    for (Entry<String, String> entry : properties.entrySet()) 
-	    {
-	        params.add(entry.getKey(), entry.getValue());
-	    }
-
-	    UriComponents uriComponents = UriComponentsBuilder.newInstance()
-	            .scheme("https").host(urlWithoutProperties)
-	            .queryParams(params).build();
-	    
-	    return uriComponents.toUriString();	    
+		return url.toString();
+	}
+	
+	private void prepareAuthorizationParameters() throws IOException
+	{
+		List<String> lines = Files.readAllLines(Paths.get("src/main/resources/data.txt"));
+		
+		awsAccessKeyID = lines.get(0);
+		awsSecretAccessKey = lines.get(1);
+		regionName = lines.get(2);
+		serviceName = lines.get(3);
+		httpMethod = lines.get(4);
+		canonicalURI = lines.get(5);
+		host = lines.get(6);
 	}
 }

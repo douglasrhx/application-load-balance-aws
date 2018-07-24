@@ -211,7 +211,7 @@ public class AwsCanonicalRequest
 
             String hexSignature = convertBytesToHex(signature);
             
-            System.out.println("\n##### Signature ######\n" + hexSignature);
+            System.out.println("\n###### Signature ######\n" + hexSignature);
             
             return hexSignature;
             
@@ -238,7 +238,7 @@ public class AwsCanonicalRequest
         authorizationHeader.put("x-amz-date", xAmzDate);
         authorizationHeader.put("Authorization", buildAuthorizationString(signature));
 
-        System.out.println("\n##### Header for Request #####\n");
+        System.out.println("\n###### Header for Request ######\n");
         
         for (Map.Entry<String, String> entrySet : authorizationHeader.entrySet()) 
         {
